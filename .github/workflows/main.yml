@@ -1,0 +1,27 @@
+name: Automaticka_Redakce
+on:
+  schedule:
+    - cron: '0 * * * *' # Spustí se každou hodinu
+  workflow_dispatch:   # Umožní ti to spustit i ručně tlačítkem
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout kodu
+        uses: actions/checkout@v4
+      - name: Instalace Pythonu
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Instalace knihovny Gemini
+        run: pip install google-genai
+      - name: Generovani webu
+        run: python generator.py
+      - name: Ulozeni zmen
+        run: |
+          git config --global user.name 'NewsBot'
+          git config --global user.email 'bot@pepickuvweb.cz'
+          git add index.html
+          git commit -m "Automatická aktualizace zpráv" || echo "Žádné změny k uložení"
+          git push
